@@ -3,14 +3,16 @@
 //  RtspClient
 //
 //  Created by Brian Hamilton on 6/7/18.
-//  Copyright © 2018 Andres Rojas. All rights reserved.
+//
 //
 
 import UIKit
 
-class Login: UIViewController {
+class Login: UIViewController,UIScrollViewDelegate, UIGestureRecognizerDelegate {
     
   
+    @IBOutlet var loginScreenMainView: UIView!
+    @IBOutlet weak var loginScroll: UIScrollView!
     static var username:String = ""
     static var password:String = ""
     static var ip:String = ""
@@ -19,6 +21,7 @@ class Login: UIViewController {
     static var rtsp:String = ""
     static var controller:String = ""
     var streamToggle1 = 1
+    var identity = CGAffineTransform.identity
  //  var user = UserProfile(userName: String(username), passWord: String(password), address: String(ip), input: String (videoinput), stream: String(media), RTSPSTREAM: String(rtsp))?
     
     @IBOutlet weak var userText: UITextField!
@@ -45,6 +48,8 @@ class Login: UIViewController {
     }
     
     }
+ 
+
     @IBAction func setCompButton1Tapped(_ sender: Any) {
         
         if streamToggle1 == 1 {
@@ -57,14 +62,63 @@ class Login: UIViewController {
                compButton.setTitle("MJPEG", for: UIControl.State.normal)
                 
                 streamToggle1 = 1
-    }
+             }
     
         }
     }
+    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.hideKeyboardWhenTappedAround()
-     
+        let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(scale))
+        let rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(rotate))
+        let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
+        //
+        gestureRecognizer.delegate = self
+        pinchGesture.delegate = self
+        rotationGesture.delegate = self
+        //
+        loginScroll.minimumZoomScale = 0.5
+        loginScroll.maximumZoomScale = 10.0
+        loginScroll.zoomScale = 1.0
+        loginScroll.layer.cornerRadius = 10
+        loginScroll.layer.borderWidth = 1
+        loginScroll.layer.borderColor = UIColor.white.cgColor
+        loginScroll.addGestureRecognizer(rotationGesture)
+        loginScroll.addGestureRecognizer(gestureRecognizer)
+        loginScroll.addGestureRecognizer(pinchGesture)
+   
+    }
+    @IBAction func handlePan(_ gestureRecognizer: UIPanGestureRecognizer) {
+        if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
+            
+            let translation = gestureRecognizer.translation(in: loginScroll)
+            // note: 'view' is optional and need to be unwrapped
+            gestureRecognizer.view!.center = CGPoint(x: gestureRecognizer.view!.center.x + translation.x, y: gestureRecognizer.view!.center.y + translation.y)
+            gestureRecognizer.setTranslation(CGPoint.zero, in: loginScroll)
+        }
+    }
+    @objc func scale(_ gesture: UIPinchGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            identity = loginScroll.transform
+        case .changed,.ended:
+            loginScroll.transform = identity.scaledBy(x: gesture.scale, y: gesture.scale)
+        case .cancelled:
+            break
+        default:
+            break
+        }
+    }
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return loginScroll
+    }
+    @objc func rotate(_ gesture: UIRotationGestureRecognizer) {
+        loginScroll.transform = loginScroll.transform.rotated(by: gesture.rotation)
+    }
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
     @IBAction func setButtonTapped(_ sender: Any) {
         Login.username = userText.text!
@@ -104,3 +158,4 @@ extension UIViewController {
         view.endEditing(true)
     }
 }
+
