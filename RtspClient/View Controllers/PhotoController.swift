@@ -35,63 +35,7 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
   static var rectWidth:CGFloat = 0.0
   static var rectHeight:CGFloat = 0.0
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let touch = touches.first {
-           PhotoController.lastPoint = touch.location(in: imageView)
-            print(PhotoController.lastPoint)
-        }
-    }
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //Get the current known point and redraw
-        if let touch = touches.first {
-        PhotoController.currentPoint = touch.location(in: imageView)
-            reDrawSelectionArea(fromPoint: PhotoController.lastPoint, toPoint: PhotoController.currentPoint)
-           
-        }
-    }
-    func reDrawSelectionArea(fromPoint: CGPoint, toPoint: CGPoint) {
-        overlay.isHidden = false
-        print((imageView.image?.size.width)!)
-        print(PhotoController.lastPoint.x)
-         print((imageView.image?.size.height)!)
-             print(PhotoController.currentPoint.y)
-        
-       
-       // imageView.bounds.size = (imageView.image?.size)!
-        
-        let imageRatio = (imageView.image?.size.width)! / (imageView.image?.size.height)!
-            print(imageRatio, "imageRatio")
-            let imageRatioInvert = (imageView.image?.size.height)! / (imageView.image?.size.width)!
-        
-        let widthFactor = ((imageView.image?.size.width)! / 375) * imageRatio
-        print(widthFactor, "width")
-        print(PhotoController.lastPoint.x)
-        print(PhotoController.xPoint)
-        let heigthFactor = ((imageView.image?.size.height)! / 332) * imageRatio
-            print(heigthFactor, "heigth")
-        print(PhotoController.currentPoint.y)
-        print(PhotoController.yPoint)
-        //Calculate rect from the original point and last known point
-        let rect = CGRect(x:min(fromPoint.x, toPoint.x),
-                          y:min(fromPoint.y, toPoint.y),
-                          width:fabs(fromPoint.x - toPoint.x),
-                          height:fabs(fromPoint.y - toPoint.y));
-        PhotoController.xPoint =  PhotoController.lastPoint.x //* imageRatio
-        PhotoController.yPoint =  PhotoController.currentPoint.y //* imageRatio
-        PhotoController.rectWidth = (PhotoController.currentPoint.x - PhotoController.lastPoint.x) //* widthFactor
-        PhotoController.rectHeight = (PhotoController.currentPoint.y - PhotoController.lastPoint.y)// * heigthFactor
-        
-        overlay.frame = rect
-        
-        
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        overlay.isHidden = false
-        
-        
-      overlay.frame = CGRect.zero //reset overlay for next tap
-    }
+
     
     @IBOutlet weak var pickerView: UIView!
     override func viewDidLoad() {
@@ -99,16 +43,16 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
      
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(scale))
         let pinchGesture1 = UIPinchGestureRecognizer(target: self, action: #selector(scale1))
-         let pinchGesture2 = UIPinchGestureRecognizer(target: self, action: #selector(scale2))
+        let pinchGesture2 = UIPinchGestureRecognizer(target: self, action: #selector(scale2))
         let rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(rotate))
         let rotationGesture1 = UIRotationGestureRecognizer(target: self, action: #selector(rotate1))
-         let rotationGesture2 = UIRotationGestureRecognizer(target: self, action: #selector(rotate2))
+        let rotationGesture2 = UIRotationGestureRecognizer(target: self, action: #selector(rotate2))
         let gestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
         let gestureRecognizer1 = UIPanGestureRecognizer(target: self, action: #selector(handlePan1))
         let gestureRecognizer2 = UIPanGestureRecognizer(target: self, action: #selector(handlePan2))
-          let gestureRecognizer3 = UIPanGestureRecognizer(target: self, action: #selector(handlePan3))
-          let rotationGesture3 = UIRotationGestureRecognizer(target: self, action: #selector(rotate3))
-         let pinchGesture3 = UIPinchGestureRecognizer(target: self, action: #selector(scale3))
+        let gestureRecognizer3 = UIPanGestureRecognizer(target: self, action: #selector(handlePan3))
+        let rotationGesture3 = UIRotationGestureRecognizer(target: self, action: #selector(rotate3))
+        let pinchGesture3 = UIPinchGestureRecognizer(target: self, action: #selector(scale3))
         //
         gestureRecognizer.delegate = self
         pinchGesture.delegate = self
@@ -116,8 +60,8 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
         pinchGesture1.delegate = self
         rotationGesture1.delegate = self
         gestureRecognizer1.delegate = self
-           rotationGesture2.delegate = self
-         gestureRecognizer.delegate = self
+        rotationGesture2.delegate = self
+        gestureRecognizer.delegate = self
         pinchGesture2.delegate = self
         rotationGesture3.delegate = self
         gestureRecognizer3.delegate = self
@@ -161,14 +105,10 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
         scrollViewTwo.addSubview(secondImage)
       
         
-        ///////
+        // OverLay View Setup not being used currently
         overlay.layer.borderColor = UIColor.yellow.cgColor
         overlay.backgroundColor = UIColor.clear.withAlphaComponent(0.2)
         overlay.isHidden = false
-        
-        var masterImage:UIImage = UIImage(view:scrollMaster)
-      
-        
         //  var croppedRect:CGRect = CGRect(x: xPoint,y:yPoint,width: rectWidth, height: rectHeight)
     }
  
@@ -217,7 +157,7 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
 
     
     
-    @objc func scale3(_ gesture: UIPinchGestureRecognizer) {
+@objc func scale3(_ gesture: UIPinchGestureRecognizer) {
         switch gesture.state {
         case .began:
             identity = imageView.transform
@@ -229,7 +169,7 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
             break
         }
     }
-   @objc func scale(_ gesture: UIPinchGestureRecognizer) {
+@objc func scale(_ gesture: UIPinchGestureRecognizer) {
         switch gesture.state {
         case .began:
             identity = scrollView.transform
@@ -241,7 +181,7 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
             break
         }
     }
-    @objc func scale1(_ gesture: UIPinchGestureRecognizer) {
+@objc func scale1(_ gesture: UIPinchGestureRecognizer) {
         switch gesture.state {
         case .began:
             identity = scrollViewTwo.transform
@@ -253,7 +193,7 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
             break
         }
     }
-    @objc func scale2(_ gesture: UIPinchGestureRecognizer) {
+@objc func scale2(_ gesture: UIPinchGestureRecognizer) {
         switch gesture.state {
         case .began:
             identity = secondImage.transform
@@ -265,29 +205,29 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
             break
         }
     }
-   @objc func rotate(_ gesture: UIRotationGestureRecognizer) {
+@objc func rotate(_ gesture: UIRotationGestureRecognizer) {
        scrollView.transform = scrollView.transform.rotated(by: gesture.rotation)
     }
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
-    @objc func rotate1(_ gesture: UIRotationGestureRecognizer) {
+@objc func rotate1(_ gesture: UIRotationGestureRecognizer) {
       secondImage.transform = secondImage.transform.rotated(by: gesture.rotation)
     }
-    @objc func rotate2(_ gesture: UIRotationGestureRecognizer) {
+@objc func rotate2(_ gesture: UIRotationGestureRecognizer) {
         scrollMaster.transform = scrollViewTwo.transform.rotated(by: gesture.rotation)
     }
-    @objc func rotate3(_ gesture: UIRotationGestureRecognizer) {
+@objc func rotate3(_ gesture: UIRotationGestureRecognizer) {
         imageView.transform = imageView.transform.rotated(by: gesture.rotation)
     }
-    func gestureRecognizer1(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+func gestureRecognizer1(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
-    func gestureRecognizer3(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+func gestureRecognizer3(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
     
-    @IBAction func Filter(_ sender: Any) {
+@IBAction func Filter(_ sender: Any) {
        
       
         guard let image = imageView?.image, let cgimg = image.cgImage else {
@@ -299,21 +239,16 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
         let coreImage = CIImage(cgImage: cgimg)
         let filter = CIFilter(name: "\(PhotoController.filterName)")
         filter?.setValue(coreImage, forKey: kCIInputImageKey)
-    //    filter?.setValue(1.0, forKey: kCIInputIntensityKey)
-        
-        if let output = filter?.value(forKey: kCIOutputImageKey) as? CIImage {
+                                                            //    filter?.setValue(1.0, forKey: kCIInputIntensityKey)
+               if let output = filter?.value(forKey: kCIOutputImageKey) as? CIImage {
             let filteredImage = UIImage(ciImage: output)
-            
             secondImage.image = filteredImage
-           
-    
         }
             
         else {
             print("image filtering failed")
         }
     }
-    
     
     @IBAction func saveFilterPhotoAction(_ sender: Any) {
         let masterImage = UIImage(view: scrollMaster)
@@ -330,8 +265,9 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
         alert.addAction(action)
         self.present(alert, animated: true, completion: nil)
         
-        
     }
+    
+    //Crop Button, not functioning Properly
     @IBAction func cropAction(_ sender: Any) {
         
         var cropMaster = UIImage(view: scrollMaster)
@@ -342,14 +278,10 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
         print(PhotoController.rectMade)
         print(imageView.image?.size as Any)
     }
-    
-    
+    // Seems to be working
     @IBAction func faceAction(_ sender: Any) {
-    
         let masterImage = UIImage(view: scrollMaster)
-
         process(masterImage)
-        
     }
     
     func process(_ image: UIImage) {
@@ -407,7 +339,7 @@ class PhotoController: UIViewController, UIImagePickerControllerDelegate, UINavi
        
         let cgimage = image.cgImage!
         let contextImage: UIImage = UIImage(cgImage: cgimage)
-        let contextSize: CGSize = contextImage.size
+       // let __CGSize__CGSize = contextImage.size
        
         
         // Create bitmap image from context using the rect
